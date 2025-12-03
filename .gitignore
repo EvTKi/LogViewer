@@ -1,0 +1,4 @@
+log/
+logs/
+*.log
+**/appsettings.local.json
