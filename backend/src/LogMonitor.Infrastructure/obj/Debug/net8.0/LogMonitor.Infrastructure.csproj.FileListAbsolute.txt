@@ -1,0 +1,15 @@
+D:\Dev\LogViewer\backend\src\LogMonitor.Infrastructure\obj\Debug\net8.0\LogMonitor.Infrastructure.csproj.AssemblyReference.cache
+D:\Dev\LogViewer\backend\src\LogMonitor.Infrastructure\obj\Debug\net8.0\LogMonitor.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+D:\Dev\LogViewer\backend\src\LogMonitor.Infrastructure\obj\Debug\net8.0\LogMonitor.Infrastructure.AssemblyInfoInputs.cache
+D:\Dev\LogViewer\backend\src\LogMonitor.Infrastructure\obj\Debug\net8.0\LogMonitor.Infrastructure.AssemblyInfo.cs
+D:\Dev\LogViewer\backend\src\LogMonitor.Infrastructure\obj\Debug\net8.0\LogMonitor.Infrastructure.csproj.CoreCompileInputs.cache
+D:\Dev\LogViewer\backend\src\LogMonitor.Infrastructure\bin\Debug\net8.0\LogMonitor.Infrastructure.deps.json
+D:\Dev\LogViewer\backend\src\LogMonitor.Infrastructure\bin\Debug\net8.0\LogMonitor.Infrastructure.dll
+D:\Dev\LogViewer\backend\src\LogMonitor.Infrastructure\bin\Debug\net8.0\LogMonitor.Infrastructure.pdb
+D:\Dev\LogViewer\backend\src\LogMonitor.Infrastructure\bin\Debug\net8.0\LogMonitor.Core.dll
+D:\Dev\LogViewer\backend\src\LogMonitor.Infrastructure\bin\Debug\net8.0\LogMonitor.Core.pdb
+D:\Dev\LogViewer\backend\src\LogMonitor.Infrastructure\obj\Debug\net8.0\LogMonit.962D9917.Up2Date
+D:\Dev\LogViewer\backend\src\LogMonitor.Infrastructure\obj\Debug\net8.0\LogMonitor.Infrastructure.dll
+D:\Dev\LogViewer\backend\src\LogMonitor.Infrastructure\obj\Debug\net8.0\refint\LogMonitor.Infrastructure.dll
+D:\Dev\LogViewer\backend\src\LogMonitor.Infrastructure\obj\Debug\net8.0\LogMonitor.Infrastructure.pdb
+D:\Dev\LogViewer\backend\src\LogMonitor.Infrastructure\obj\Debug\net8.0\ref\LogMonitor.Infrastructure.dll

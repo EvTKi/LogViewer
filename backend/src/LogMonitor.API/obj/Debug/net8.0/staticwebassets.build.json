@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "gHzzTZFzCj8AzI+HMnWtRG6CE3VmP2+WXwuPJLZnjz0=",
+  "Source": "LogMonitor.API",
+  "BasePath": "_content/LogMonitor.API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
