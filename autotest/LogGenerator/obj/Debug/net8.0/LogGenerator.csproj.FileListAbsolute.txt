@@ -1,0 +1,14 @@
+D:\Dev\LogViewer\autotest\LogGenerator\bin\Debug\net8.0\LogGenerator.exe
+D:\Dev\LogViewer\autotest\LogGenerator\bin\Debug\net8.0\LogGenerator.deps.json
+D:\Dev\LogViewer\autotest\LogGenerator\bin\Debug\net8.0\LogGenerator.runtimeconfig.json
+D:\Dev\LogViewer\autotest\LogGenerator\bin\Debug\net8.0\LogGenerator.dll
+D:\Dev\LogViewer\autotest\LogGenerator\bin\Debug\net8.0\LogGenerator.pdb
+D:\Dev\LogViewer\autotest\LogGenerator\obj\Debug\net8.0\LogGenerator.GeneratedMSBuildEditorConfig.editorconfig
+D:\Dev\LogViewer\autotest\LogGenerator\obj\Debug\net8.0\LogGenerator.AssemblyInfoInputs.cache
+D:\Dev\LogViewer\autotest\LogGenerator\obj\Debug\net8.0\LogGenerator.AssemblyInfo.cs
+D:\Dev\LogViewer\autotest\LogGenerator\obj\Debug\net8.0\LogGenerator.csproj.CoreCompileInputs.cache
+D:\Dev\LogViewer\autotest\LogGenerator\obj\Debug\net8.0\LogGenerator.dll
+D:\Dev\LogViewer\autotest\LogGenerator\obj\Debug\net8.0\refint\LogGenerator.dll
+D:\Dev\LogViewer\autotest\LogGenerator\obj\Debug\net8.0\LogGenerator.pdb
+D:\Dev\LogViewer\autotest\LogGenerator\obj\Debug\net8.0\LogGenerator.genruntimeconfig.cache
+D:\Dev\LogViewer\autotest\LogGenerator\obj\Debug\net8.0\ref\LogGenerator.dll
