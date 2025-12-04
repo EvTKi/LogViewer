@@ -12,7 +12,8 @@ public class LogMonitorDbContext : DbContext
     public DbSet<ErrorEntity> Errors => Set<ErrorEntity>();
     public DbSet<NotificationEntity> Notifications => Set<NotificationEntity>();
     public DbSet<FilePositionEntity> FilePositions => Set<FilePositionEntity>();
-
+    public DbSet<TelegramSubscriberEntity> TelegramSubscribers => Set<TelegramSubscriberEntity>();
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ErrorEntity>(entity =>
@@ -38,6 +39,11 @@ public class LogMonitorDbContext : DbContext
             entity.HasKey(fp => fp.FilePath);
             entity.Property(fp => fp.FilePath).IsRequired();
             entity.Property(fp => fp.LastPosition).IsRequired();
+        });
+        modelBuilder.Entity<TelegramSubscriberEntity>(entity =>
+        {
+            entity.HasKey(t => t.ChatId);
+            entity.Property(t => t.ChatId).ValueGeneratedNever();
         });
     }
 }

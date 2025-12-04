@@ -109,4 +109,46 @@ public class TelegramService
             await dbContext.SaveChangesAsync();
         }
     }
+    public async Task SendToAllSubscribersAsync(string messageText)
+    {
+        if (!_options.IsEnabled) return;
+
+        // Получаем DbContext через scope, как в MarkAsSentAsync
+        using var scope = _serviceProvider.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<LogMonitorDbContext>();
+
+        var subscribers = await dbContext.TelegramSubscribers
+            .Where(s => s.ChatId > 0)
+            .ToListAsync();
+
+        foreach (var sub in subscribers)
+        {
+            await SendToChatAsync(sub.ChatId, messageText);
+        }
+    }
+
+    private async Task SendToChatAsync(long chatId, string text)
+    {
+        var payload = new { chat_id = chatId, text, parse_mode = "HTML" };
+        var url = $"https://api.telegram.org/bot{_options.BotToken}/sendMessage";
+
+        for (int attempt = 1; attempt <= 3; attempt++)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync(url, payload);
+                if (response.IsSuccessStatusCode)
+                {
+                    _logger.LogInformation("✅ Отправлено в Telegram чат {ChatId}", chatId);
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Telegram попытка {Attempt} для чата {ChatId}", attempt, chatId);
+            }
+            if (attempt < 3) await Task.Delay(TimeSpan.FromSeconds(Math.Pow(2, attempt - 1)));
+        }
+        _logger.LogError("❌ Не удалось отправить в Telegram чат {ChatId}", chatId);
+    }
 }

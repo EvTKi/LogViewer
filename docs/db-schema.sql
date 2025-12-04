@@ -28,3 +28,10 @@ CREATE TABLE "FilePositions" (
     "FilePath" TEXT PRIMARY KEY,
     "LastPosition" BIGINT NOT NULL
 );
+-- TelegramSubscribers (id чатов с ботом)
+CREATE TABLE "TelegramSubscribers" (
+    "ChatId" BIGINT PRIMARY KEY,      -- ID чата (может быть отрицательным для групп, но мы будем брать только личные — положительные)
+    "FirstName" TEXT,
+    "Username" TEXT,
+    "SubscribedAt" TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);

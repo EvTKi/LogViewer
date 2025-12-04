@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LogMonitor.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+854ef6e7c19f6f64ffbfcae558313797836ba5bb")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f1bf2df364f97c98f4fe40712960d4d035def84e")]
 [assembly: System.Reflection.AssemblyProductAttribute("LogMonitor.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LogMonitor.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

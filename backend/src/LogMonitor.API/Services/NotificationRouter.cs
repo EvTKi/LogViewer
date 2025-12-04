@@ -27,24 +27,14 @@ public class NotificationRouter : INotificationRouter
         _logger = logger;
     }
 
-
     public async Task RouteErrorAsync(ErrorDto errorDto)
     {
+        // SignalR
         await _hubContext.Clients.All.SendAsync("ReceiveError", errorDto);
 
-        try
-        {
-            using var scope = _serviceProvider.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<LogMonitorDbContext>();
-            var error = await dbContext.Errors.FindAsync(errorDto.Id);
-            if (error != null)
-            {
-                _ = _telegramService.SendErrorAsync(error);
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Ошибка при отправке в Telegram для ошибки {Id}", errorDto.Id);
-        }
+        // Telegram — всем подписчикам
+        var message = $"🚨 Новая ошибка!\nФайл: {errorDto.FileName}\nВремя: {errorDto.CreatedAt:yyyy-MM-dd HH:mm:ss}\nСодержимое:\n{errorDto.Content}";
+        _ = _telegramService.SendToAllSubscribersAsync(message); // fire-and-forget
     }
+    
 }

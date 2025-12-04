@@ -45,6 +45,7 @@ builder.Services.AddDbContext<LogMonitorDbContext>(opt =>
 // Телеграмм
 builder.Services.Configure<TelegramOptions>(
     builder.Configuration.GetSection("Telegram"));
+builder.Services.AddHostedService<TelegramPollingService>();
 
 builder.Services.AddHttpClient(); // для IHttpClientFactory
 builder.Services.AddSingleton<TelegramService>();
