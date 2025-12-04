@@ -1,4 +1,69 @@
-log/
-logs/
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio (если используешь)
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# ReSharper (если используется)
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# Rider
+.idea/
+
+# VS Code (опционально — если не хочешь делиться настройками)
+# .vscode/settings.json
+# .vscode/tasks.json
+# .vscode/launch.json
+# .vscode/extensions.json
+
+# NuGet
+packages/
+*.nupkg
+*.nuspec
+nuget.exe
+
+# .NET Core
+project.lock.json
+project.assets.json
+*.dotnet-dev-certs
+*.dotnet-user-secrets
+
+# macOS (если работаешь на Mac или в смешанной среде)
+.DS_Store
+
+# Secrets (обязательно!)
+secrets.json
+appsettings.Development.json
+appsettings.Local.json
+# Но: appsettings.json (без суффиксов) обычно **включают** в репозиторий!
+
+# Логи и временные файлы
 *.log
-**/appsettings.local.json
+logs/
+*.tmp
+temp/
+tmp/
+
+# Покрытие кода и тесты
+coverage/
+*.coverage
+*.coveragexml
+
+# Docker (опционально)
+docker-compose.override.yml
