@@ -1,9 +1,13 @@
 using System.IO;
+using Serilog;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using Serilog;
-using LogMonitor.Infrastructure.Data;
 
+using LogMonitor.Core.Configs;
+using LogMonitor.Infrastructure.Data;
+using LogMonitor.Infrastructure.Services;
+try
+{
 // 1. Определяем путь к логам
 var logDir = Path.Combine(Directory.GetCurrentDirectory(), "log");
 Directory.CreateDirectory(logDir);
@@ -11,9 +15,16 @@ Directory.CreateDirectory(logDir);
 // 2. Создаём WebApplicationBuilder — ТОЛЬКО ОН даёт доступ к Configuration
 var builder = WebApplication.CreateBuilder(args);
 
+var localConfigPath = Path.Combine(builder.Environment.ContentRootPath, "appsettings.local.json");
+if (File.Exists(localConfigPath))
+{
+    builder.Configuration.AddJsonFile(localConfigPath, optional: false, reloadOnChange: true);
+}
+
 // 3. Настраиваем Serilog СРАЗУ ПОСЛЕ builder
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
+   // .WriteTo.Console(outputTemplate: "{Timestamp:HH:mm:ss} [{Level:u3}] [{SourceContext}] - {Message:lj}{NewLine}{Exception}")
     .WriteTo.File(
         path: Path.Combine(logDir, "LogViewer_.log"),
         outputTemplate: "{Timestamp:HH:mm:ss} [{Level:u3}] [{SourceContext}] - {Message:lj}{NewLine}{Exception}",
@@ -28,8 +39,15 @@ builder.Host.UseSerilog();
 
 // 5. Далее — обычная настройка
 var conn = builder.Configuration.GetConnectionString("DefaultConnection");
+//Console.WriteLine($"🔍 ConnectionString: '{conn}'");
 builder.Services.AddDbContext<LogMonitorDbContext>(opt =>
     opt.UseNpgsql(conn));
+// Телеграмм
+builder.Services.Configure<TelegramOptions>(
+    builder.Configuration.GetSection("Telegram"));
+
+builder.Services.AddHttpClient(); // для IHttpClientFactory
+builder.Services.AddSingleton<TelegramService>();
 
 builder.Services.AddSingleton<LogMonitor.Core.Services.IErrorDetectionService, LogMonitor.Infrastructure.Services.ErrorDetectionService>();
 builder.Services.AddSingleton<LogMonitor.Core.Services.IFileMonitoringService, LogMonitor.Infrastructure.Services.HybridFileWatcher>();
@@ -81,3 +99,9 @@ catch (Exception ex)
     Environment.Exit(1);
 }
 app.Run();
+}
+catch (Exception ex)
+{
+    Console.WriteLine("❗ FATAL ERROR: " + ex);
+    throw;
+}

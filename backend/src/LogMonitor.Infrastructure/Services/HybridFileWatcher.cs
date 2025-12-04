@@ -96,11 +96,18 @@ public class HybridFileWatcher : IFileMonitoringService
 
     private async void OnFileRenamed(object sender, RenamedEventArgs e)
     {
-        if (!_isRunning) return;
-        if (MatchesAnyMask(e.OldFullPath))
-            _filePositions.Remove(e.OldFullPath);
-        if (MatchesAnyMask(e.FullPath))
-            _ = ProcessFileAsync(e.FullPath);
+        try
+        {
+            if (!_isRunning) return;
+            if (MatchesAnyMask(e.OldFullPath))
+                _filePositions.Remove(e.OldFullPath);
+            if (MatchesAnyMask(e.FullPath))
+                _ = ProcessFileAsync(e.FullPath);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка в OnFileRenamed для файла {File}", e.FullPath);
+        }
     }
 
     private void OnFileDeleted(object sender, FileSystemEventArgs e)
