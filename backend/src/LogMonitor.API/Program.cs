@@ -118,8 +118,8 @@ builder.Services.Configure<TelegramOptions>(
     builder.Configuration.GetSection("Telegram"));
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<TelegramService>();
+builder.Services.AddHostedService<TelegramPollingService>();
 
-builder.Services.AddSingleton<TelegramService>();
 
 builder.Services.AddSingleton<LogMonitor.Core.Services.IErrorDetectionService, LogMonitor.Infrastructure.Services.ErrorDetectionService>();
 builder.Services.AddSingleton<LogMonitor.Core.Services.IFileMonitoringService, LogMonitor.Infrastructure.Services.HybridFileWatcher>();
