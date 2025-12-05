@@ -6,6 +6,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using HealthChecks.NpgSql;
 
 using LogMonitor.Core.Configs;
+using LogMonitor.Core.Services;
 using LogMonitor.Infrastructure.Data;
 using LogMonitor.Infrastructure.Services;
 
@@ -103,7 +104,17 @@ builder.Host.UseSerilog();
 
 // 5. Далее — обычная настройка
 var conn = builder.Configuration.GetConnectionString("DefaultConnection");
+if (!string.IsNullOrEmpty(conn))
+{
+    builder.Services.AddHealthChecks()
+        .AddNpgSql(conn);
+}
 // Console.WriteLine($"🔍 ConnectionString: '{conn}'");
+
+// чтение паттернов ошибок
+var errorPatterns = builder.Configuration
+    .GetSection("Monitoring:ErrorPatterns")
+    .Get<string[]>() ?? new[] { "ERR" };
 
 builder.Services.AddDbContext<LogMonitorDbContext>(opt =>
 {
@@ -111,8 +122,7 @@ builder.Services.AddDbContext<LogMonitorDbContext>(opt =>
     opt.EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
 });
 
-builder.Services.AddHealthChecks()
-    .AddNpgSql(builder.Configuration.GetConnectionString("DefaultConnection"));
+// builder.Services.AddHealthChecks().AddNpgSql(builder.Configuration.GetConnectionString("DefaultConnection"));
 // Телеграмм
 builder.Services.Configure<TelegramOptions>(
     builder.Configuration.GetSection("Telegram"));
@@ -121,11 +131,8 @@ builder.Services.AddSingleton<TelegramService>();
 builder.Services.AddHostedService<TelegramPollingService>();
 
 
-builder.Services.AddSingleton<IErrorDetectionService>(sp =>
-{
-    var config = sp.GetRequiredService<IConfiguration>();
-    return new ErrorDetectionService(config);
-});
+builder.Services.AddSingleton<IErrorDetectionService>(
+    _ => new ErrorDetectionService(errorPatterns));
 builder.Services.AddSingleton<LogMonitor.Core.Services.IFileMonitoringService, LogMonitor.Infrastructure.Services.HybridFileWatcher>();
 builder.Services.AddSingleton<LogMonitor.Core.Services.INotificationRouter, LogMonitor.API.Services.NotificationRouter>();
 builder.Services.AddHostedService<LogMonitor.Infrastructure.BackgroundServices.LogMonitoringHostedService>();
