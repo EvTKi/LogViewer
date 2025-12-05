@@ -193,12 +193,25 @@ CREATE TABLE "TelegramSubscribers" (
 
 ### Пример подключения SignalR (JavaScript)
 ```js
+await new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js'; // ← убраны пробелы в конце!
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+});
+
 const conn = new signalR.HubConnectionBuilder()
     .withUrl("http://localhost:5000/errorhub")
     .build();
 
-conn.on("ReceiveError", err => console.log("🚨", err));
-conn.start();
+conn.on("ReceiveError", err => console.log("🚨 Новая ошибка:", err));
+
+conn.start().then(() => {
+    console.log("✅ SignalR подключён!");
+}).catch(err => {
+    console.error("❌ Ошибка подключения:", err);
+});
 ```
 
 ### Требования к Telegram-боту
