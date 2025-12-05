@@ -12,15 +12,18 @@ public class NotificationRouter : INotificationRouter
 {
     private readonly IHubContext<ErrorNotificationHub> _hubContext;
     private readonly TelegramService _telegramService;
+    private readonly EmailService _emailService; 
     private readonly ILogger<NotificationRouter> _logger;
 
     public NotificationRouter(
         IHubContext<ErrorNotificationHub> hubContext,
         TelegramService telegramService,
+        EmailService emailService, 
         ILogger<NotificationRouter> logger)
     {
         _hubContext = hubContext;
         _telegramService = telegramService;
+        _emailService = emailService;
         _logger = logger;
     }
 
@@ -33,6 +36,7 @@ public class NotificationRouter : INotificationRouter
         try
         {
             await _telegramService.SendErrorNotificationAsync(errorDto);
+            await _emailService.SendErrorNotificationAsync(errorDto);
         }
         catch (Exception ex)
         {

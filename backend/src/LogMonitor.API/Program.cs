@@ -116,8 +116,10 @@ builder.Services.AddHealthChecks()
 // Телеграмм
 builder.Services.Configure<TelegramOptions>(
     builder.Configuration.GetSection("Telegram"));
+builder.Services.Configure<EmailOptions>(
+    builder.Configuration.GetSection("Email"));
+
 builder.Services.AddHttpClient();
-builder.Services.AddSingleton<TelegramService>();
 builder.Services.AddHostedService<TelegramPollingService>();
 
 
@@ -125,6 +127,9 @@ builder.Services.AddSingleton<LogMonitor.Core.Services.IErrorDetectionService, L
 builder.Services.AddSingleton<LogMonitor.Core.Services.IFileMonitoringService, LogMonitor.Infrastructure.Services.HybridFileWatcher>();
 builder.Services.AddSingleton<LogMonitor.Core.Services.INotificationRouter, LogMonitor.API.Services.NotificationRouter>();
 builder.Services.AddHostedService<LogMonitor.Infrastructure.BackgroundServices.LogMonitoringHostedService>();
+builder.Services.AddSingleton<TelegramService>();
+builder.Services.AddSingleton<EmailService>();
+
 
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
