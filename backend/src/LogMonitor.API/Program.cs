@@ -121,7 +121,11 @@ builder.Services.AddSingleton<TelegramService>();
 builder.Services.AddHostedService<TelegramPollingService>();
 
 
-builder.Services.AddSingleton<LogMonitor.Core.Services.IErrorDetectionService, LogMonitor.Infrastructure.Services.ErrorDetectionService>();
+builder.Services.AddSingleton<IErrorDetectionService>(sp =>
+{
+    var config = sp.GetRequiredService<IConfiguration>();
+    return new ErrorDetectionService(config);
+});
 builder.Services.AddSingleton<LogMonitor.Core.Services.IFileMonitoringService, LogMonitor.Infrastructure.Services.HybridFileWatcher>();
 builder.Services.AddSingleton<LogMonitor.Core.Services.INotificationRouter, LogMonitor.API.Services.NotificationRouter>();
 builder.Services.AddHostedService<LogMonitor.Infrastructure.BackgroundServices.LogMonitoringHostedService>();
