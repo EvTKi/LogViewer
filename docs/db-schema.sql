@@ -34,4 +34,5 @@ CREATE TABLE "TelegramSubscribers" (
     "FirstName" TEXT,
     "Username" TEXT,
     "SubscribedAt" TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    "IsActive" BOOLEAN NOT NULL DEFAULT true
 );

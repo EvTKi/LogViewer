@@ -6,4 +6,5 @@ public class TelegramSubscriberEntity
     public string? FirstName { get; set; }
     public string? Username { get; set; }
     public DateTime SubscribedAt { get; set; } = DateTime.UtcNow;
+    public bool IsActive { get; set; } = true;
 }

@@ -118,7 +118,7 @@ public class TelegramService
         var dbContext = scope.ServiceProvider.GetRequiredService<LogMonitorDbContext>();
 
         var subscribers = await dbContext.TelegramSubscribers
-            .Where(s => s.ChatId > 0)
+            .Where(s => s.ChatId > 0 && s.IsActive)
             .ToListAsync();
 
         foreach (var sub in subscribers)

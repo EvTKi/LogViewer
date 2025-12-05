@@ -23,15 +23,18 @@ public class LogMonitoringHostedService : IHostedService
 
     public async Task StartAsync(CancellationToken ct)
     {
-        _logger.LogInformation("🔄 Фоновая служба мониторинга логов запускается...");
         var logDir = _configuration["Monitoring:LogDirectory"] ?? @"D:\logs";
         var masks = (_configuration["Monitoring:FileMasks"] ?? "*.log")
             .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
-        _logger.LogInformation("📁 Отслеживаемая директория: {LogDir}, маски: {Masks}", logDir, string.Join(", ", masks));
+        // 🔹 Преобразуем относительный путь в абсолютный
+        if (!Path.IsPathFullyQualified(logDir))
+        {
+            logDir = Path.GetFullPath(logDir);
+            _logger.LogInformation("Преобразован относительный путь в абсолютный: {LogDir}", logDir);
+        }
 
         await _monitoringService.StartMonitoringAsync(logDir, masks);
-        _logger.LogInformation("✅ Фоновая служба мониторинга логов запущена.");
     }
 
     public async Task StopAsync(CancellationToken ct)

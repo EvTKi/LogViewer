@@ -39,7 +39,8 @@ builder.Host.UseSerilog();
 
 // 5. Далее — обычная настройка
 var conn = builder.Configuration.GetConnectionString("DefaultConnection");
-//Console.WriteLine($"🔍 ConnectionString: '{conn}'");
+// Console.WriteLine($"🔍 ConnectionString: '{conn}'");
+
 builder.Services.AddDbContext<LogMonitorDbContext>(opt =>
     opt.UseNpgsql(conn));
 // Телеграмм
