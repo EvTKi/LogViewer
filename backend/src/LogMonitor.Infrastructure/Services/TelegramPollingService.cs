@@ -154,7 +154,7 @@ public class TelegramPollingService : BackgroundService
 
                 var firstName = chat.TryGetProperty("first_name", out var fn) ? fn.GetString() : null;
                 var username = chat.TryGetProperty("username", out var un) ? un.GetString() : null;
-
+                // FIXME: поправить принятие команд
                 bool isStart = command == "/start" || command.StartsWith("/start@");
                 bool isUnsubscribe = command == "/unsubscribe" || command.StartsWith("/unsubscribe@");
 

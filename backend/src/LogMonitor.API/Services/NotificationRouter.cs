@@ -12,29 +12,31 @@ public class NotificationRouter : INotificationRouter
 {
     private readonly IHubContext<ErrorNotificationHub> _hubContext;
     private readonly TelegramService _telegramService;
-    private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<NotificationRouter> _logger;
 
     public NotificationRouter(
-    IHubContext<ErrorNotificationHub> hubContext,
-    TelegramService telegramService,
-    IServiceProvider serviceProvider, // ← провайдер
-    ILogger<NotificationRouter> logger)
+        IHubContext<ErrorNotificationHub> hubContext,
+        TelegramService telegramService,
+        ILogger<NotificationRouter> logger)
     {
         _hubContext = hubContext;
         _telegramService = telegramService;
-        _serviceProvider = serviceProvider;
         _logger = logger;
     }
 
     public async Task RouteErrorAsync(ErrorDto errorDto)
     {
-        // SignalR
+        // 1. SignalR
         await _hubContext.Clients.All.SendAsync("ReceiveError", errorDto);
 
-        // Telegram — всем подписчикам
-        var message = $"🚨 Новая ошибка!\nФайл: {errorDto.FileName}\nВремя: {errorDto.CreatedAt:yyyy-MM-dd HH:mm:ss}\nСодержимое:\n{errorDto.Content}";
-        _ = _telegramService.SendToAllSubscribersAsync(message); // fire-and-forget
+        // 2. Telegram — оба режима (чат + подписчики)
+        try
+        {
+            await _telegramService.SendErrorNotificationAsync(errorDto);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Ошибка при отправке в Telegram для ошибки {Id}", errorDto.Id);
+        }
     }
-    
 }

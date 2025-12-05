@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Http;
 
+using LogMonitor.Core.Dtos;
 namespace LogMonitor.Infrastructure.Services;
 
 public class TelegramService
@@ -95,6 +96,34 @@ public class TelegramService
         return false;
     }
 
+    public async Task SendErrorNotificationAsync(ErrorDto errorDto)
+    {
+        if (!_options.IsEnabled || string.IsNullOrWhiteSpace(_options.BotToken))
+            return;
+
+        var message = $"🚨 Новая ошибка в логе!\nФайл: {errorDto.FileName}\nВремя: {errorDto.CreatedAt:yyyy-MM-dd HH:mm:ss}\nСодержимое:\n{errorDto.Content}";
+
+        var sendTasks = new List<Task<bool>>();
+
+        // 1. Отправка в указанный чат (если задан)
+        if (!string.IsNullOrWhiteSpace(_options.ChatId))
+        {
+            sendTasks.Add(SendMessageToChatAsync(_options.ChatId!, message));
+        }
+
+        // 2. Отправка подписчикам
+        sendTasks.Add(SendMessageToSubscribersAsync(message));
+
+        // Ждём все отправки
+        var results = await Task.WhenAll(sendTasks);
+
+        // Если хотя бы одна отправка успешна — обновляем флаг
+        if (results.Any(success => success))
+        {
+            await MarkAsSentAsync(errorDto.Id);
+        }
+    }
+
     private async Task MarkAsSentAsync(int errorId)
     {
         using var scope = _serviceProvider.CreateScope();
@@ -123,11 +152,10 @@ public class TelegramService
 
         foreach (var sub in subscribers)
         {
-            await SendToChatAsync(sub.ChatId, messageText);
+            await SendMessageToChatAsync(sub.ChatId.ToString(), messageText);
         }
     }
-
-    private async Task SendToChatAsync(long chatId, string text)
+    private async Task<bool> SendMessageToChatAsync(string chatId, string text)
     {
         var payload = new { chat_id = chatId, text, parse_mode = "HTML" };
         var url = $"https://api.telegram.org/bot{_options.BotToken}/sendMessage";
@@ -140,15 +168,29 @@ public class TelegramService
                 if (response.IsSuccessStatusCode)
                 {
                     _logger.LogInformation("✅ Отправлено в Telegram чат {ChatId}", chatId);
-                    return;
+                    return true;
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Telegram попытка {Attempt} для чата {ChatId}", attempt, chatId);
+                _logger.LogWarning(ex, "Ошибка отправки в чат {ChatId} (попытка {Attempt})", chatId, attempt);
             }
             if (attempt < 3) await Task.Delay(TimeSpan.FromSeconds(Math.Pow(2, attempt - 1)));
         }
-        _logger.LogError("❌ Не удалось отправить в Telegram чат {ChatId}", chatId);
+        return false;
+    }
+
+    private async Task<bool> SendMessageToSubscribersAsync(string text)
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<LogMonitorDbContext>();
+
+        var subscribers = await dbContext.TelegramSubscribers
+            .Where(s => s.IsActive && s.ChatId > 0)
+            .ToListAsync();
+
+        var tasks = subscribers.Select(s => SendMessageToChatAsync(s.ChatId.ToString(), text));
+        var results = await Task.WhenAll(tasks);
+        return results.Any(r => r);
     }
 }

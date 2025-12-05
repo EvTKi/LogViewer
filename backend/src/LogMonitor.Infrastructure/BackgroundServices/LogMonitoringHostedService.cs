@@ -36,6 +36,8 @@ public class LogMonitoringHostedService : IHostedService
 
         await _monitoringService.StartMonitoringAsync(logDir, masks);
     }
+    
+   
 
     public async Task StopAsync(CancellationToken ct)
     {

@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LogMonitor.Infrastructure.Services;
-
+// TODO: прикрутить маску по строке сообщения
 public class HybridFileWatcher : IFileMonitoringService
 {
     private readonly IServiceProvider _serviceProvider;
@@ -18,6 +18,7 @@ public class HybridFileWatcher : IFileMonitoringService
     private readonly ILogger<HybridFileWatcher> _logger;
     private readonly Dictionary<string, long> _filePositions = new();
     private readonly List<FileSystemWatcher> _watchers = new();
+    private readonly HashSet<string> _watchedFiles = new(StringComparer.OrdinalIgnoreCase);
     private string _directory = "";
     private string[] _fileMasks = Array.Empty<string>();
     private bool _isRunning;
@@ -40,7 +41,9 @@ public class HybridFileWatcher : IFileMonitoringService
 
         _directory = directory;
         _fileMasks = fileMasks;
+        RefreshWatchedFiles();
         _isRunning = true;
+        
 
         // Загружаем позиции из БД
         Dictionary<string, long> savedPositions;
@@ -69,7 +72,7 @@ public class HybridFileWatcher : IFileMonitoringService
         await ScanExistingFilesAsync();
     }
 
-    public Task StopMonitoringAsync()
+    public async Task StopMonitoringAsync()
     {
         _isRunning = false;
         foreach (var w in _watchers)
@@ -78,13 +81,34 @@ public class HybridFileWatcher : IFileMonitoringService
             w.Dispose();
         }
         _watchers.Clear();
-        return Task.CompletedTask;
+
+        // Сохраняем позиции в БД
+        using var scope = _serviceProvider.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<LogMonitorDbContext>();
+        foreach (var (filePath, position) in _filePositions)
+        {
+            var existing = await dbContext.FilePositions.FindAsync(filePath);
+            if (existing != null)
+            {
+                existing.LastPosition = position;
+            }
+            else
+            {
+                dbContext.FilePositions.Add(new FilePositionEntity
+                {
+                    FilePath = filePath,
+                    LastPosition = position
+                });
+            }
+        }
+        await dbContext.SaveChangesAsync();
     }
 
     private async void OnFileChanged(object sender, FileSystemEventArgs e)
     {
         try
         {
+            RefreshWatchedFiles(); // ← добавь
             if (!_isRunning || !MatchesAnyMask(e.FullPath)) return;
             await ProcessFileAsync(e.FullPath).ConfigureAwait(false);
         }
@@ -112,14 +136,24 @@ public class HybridFileWatcher : IFileMonitoringService
 
     private void OnFileDeleted(object sender, FileSystemEventArgs e)
     {
+        RefreshWatchedFiles();
         if (MatchesAnyMask(e.FullPath))
             _filePositions.Remove(e.FullPath);
     }
-
     private bool MatchesAnyMask(string fullPath)
     {
-        var fileName = Path.GetFileName(fullPath);
-        return _fileMasks.Any(mask => Directory.GetFiles(_directory, mask).Contains(fullPath));
+        return _watchedFiles.Contains(fullPath);
+    }
+    private void RefreshWatchedFiles()
+    {
+        _watchedFiles.Clear();
+        foreach (var mask in _fileMasks)
+        {
+            foreach (var file in Directory.GetFiles(_directory, mask))
+            {
+                _watchedFiles.Add(file);
+            }
+        }
     }
 
     private async Task ScanExistingFilesAsync()
@@ -201,6 +235,7 @@ public class HybridFileWatcher : IFileMonitoringService
                         dbContext.Errors.Add(error);
                         await dbContext.SaveChangesAsync(); // ← теперь error.Id известен
 
+                        
                         var notification = new NotificationEntity
                         {
                             ErrorId = error.Id,
